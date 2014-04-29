@@ -162,6 +162,8 @@ if [ ! "$SKIP_INSTALL" ]; then
     fi
     pyvenv $PYTHON_VERSION &> /dev/null
     source $PYTHON_VERSION/bin/activate &> /dev/null
+    pip install numpy
+    pip install git+https://bitbucket.org/Enucatl/get_git_version.git
   bpwatch stop install_python
 
   # Record for future reference.
