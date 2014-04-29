@@ -160,12 +160,8 @@ if [ ! "$SKIP_INSTALL" ]; then
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
       exit 1
     fi
-    ls .heroku
-    which python
-    pyvenv $PYTHON_VERSION
-    source $PYTHON_VERSION/bin/activate
-    which python
-    which pip
+    pyvenv $PYTHON_VERSION &> /dev/null
+    source $PYTHON_VERSION/bin/activate &> /dev/null
   bpwatch stop install_python
 
   # Record for future reference.
@@ -187,14 +183,14 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
     # Prepare it for the real world
     puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
     cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install
+    python setup.py install &> /dev/null
     cd $WORKING_DIR
   bpwatch stop install_setuptoools
 
   bpwatch start install_pip
     puts-step "Installing Pip ($PIP_VERSION)"
     cd $ROOT_DIR/vendor/pip-$PIP_VERSION/
-    python setup.py install
+    python setup.py install &> /dev/null
     cd $WORKING_DIR
 
   bpwatch stop install_pip
