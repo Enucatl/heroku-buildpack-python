@@ -221,9 +221,6 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
 pip install -e git+https://bitbucket.org/Enucatl/get_git_version.git#egg=get_git_version
-python -c "import get_git_version"
-python -c "from get_git_version.version import get_git_version"
-python -c "from get_git_version.get_git_version.version import get_git_version"
 ls /app/stackless-3.3.5/*
 pip install numpy
 pip install -r requirements.txt --exists-action=w --allow-all-external  | cleanup | indent
