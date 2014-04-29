@@ -155,7 +155,7 @@ fi
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
+    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jxv
     if [[ $? != 0 ]] ; then
       puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
@@ -183,7 +183,6 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
     # Prepare it for the real world
     puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
     cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    which python
     python setup.py install --prefix=$BUILD_DIR/.heroku/python 
     cd $WORKING_DIR
   bpwatch stop install_setuptoools
