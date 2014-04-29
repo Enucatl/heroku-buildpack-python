@@ -79,7 +79,7 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
-export PATH=$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$BUILD_DIR/.heroku/mercurial-2.9:$PATH
+export PATH=$BUILD_DIR/.heroku/python/shims:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$BUILD_DIR/.heroku/mercurial-2.9:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
 export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
