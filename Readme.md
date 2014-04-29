@@ -1,7 +1,8 @@
-Heroku buildpack: Python
+Heroku buildpack: Stackless Python 3.3.5
 ========================
 
-This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Python apps, powered by [pip](http://www.pip-installer.org/).
+Forked from the [Heroku python buildpack](https://github.com/heroku/heroku-buildpack-python), so that it
+installs stackless python 3.3.5.
 
 
 Usage
@@ -9,10 +10,10 @@ Usage
 
 Example usage:
 
-    $ ls
-    Procfile  requirements.txt  web.py
+    $ cat runtime.txt
+    stackless-3.3.5
 
-    $ heroku create --stack cedar --buildpack git://github.com/heroku/heroku-buildpack-python.git
+    $ heroku create --region eu --buildpack https://github.com/Enucatl/heroku-buildpack-python.git
 
     $ git push heroku master
     ...
@@ -30,26 +31,6 @@ Example usage:
            Successfully installed Flask Werkzeug Jinja2
            Cleaning up...
 
-You can also add it to upcoming builds of an existing application:
-
-    $ heroku config:add BUILDPACK_URL=git://github.com/heroku/heroku-buildpack-python.git
-
 The buildpack will detect your app as Python if it has the file `requirements.txt` in the root.
 
 It will use Pip to install your dependencies, vendoring a copy of the Python runtime into your slug.
-
-Specify a Runtime
------------------
-
-You can also provide arbitrary releases Python with a `runtime.txt` file.
-
-    $ cat runtime.txt
-    python-3.3.3
-
-Runtime options include:
-
-- python-2.7.6
-- python-3.3.3
-- pypy-1.9 (experimental)
-
-Other [unsupported runtimes](https://github.com/kennethreitz/python-versions/tree/master/formula) are available as well.
