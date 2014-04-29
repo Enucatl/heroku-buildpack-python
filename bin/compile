@@ -155,13 +155,14 @@ fi
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jxv
+    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
     if [[ $? != 0 ]] ; then
       puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
       exit 1
     fi
     mv python .heroku/python
+    pwd
   bpwatch stop install_python
 
   # Record for future reference.
