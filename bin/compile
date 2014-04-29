@@ -79,7 +79,7 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
-export PATH=$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
+export PATH=$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$BUILD_DIR/.heroku/mercurial-2.9:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
 export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
@@ -151,6 +151,15 @@ if [ -f .heroku/python-version ]; then
   fi
 fi
 
+# Install Mercurial if it appears to be required.
+if (grep -Fiq "hg+" requirements.txt) then
+  bpwatch start mercurial_install
+    curl http://mercurial.selenic.com/release/mercurial-2.9.tar.gz -s | tar xzf 
+    mv mercurial-2.9 $BUILD_DIR/.heroku
+    cd $BUILD_DIR/.heroku/mercurial-2.9
+    make local
+  bpwatch stop mercurial_install
+fi
 
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
@@ -185,13 +194,6 @@ hash -r
 bpwatch start pylibmc_install
   source $BIN_DIR/steps/pylibmc
 bpwatch stop pylibmc_install
-
-# Install Mercurial if it appears to be required.
-if (grep -Fiq "hg+" requirements.txt) then
-  bpwatch start mercurial_install
-    /app/.heroku/python/bin/pip install  mercurial | cleanup | indent
-  bpwatch stop mercurial_install
-fi
 
 # Install dependencies with Pip.
 puts-step "Installing dependencies using Pip ($PIP_VERSION)"
