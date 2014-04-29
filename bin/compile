@@ -18,7 +18,7 @@ CACHE_DIR=$2
 ENV_DIR=$3
 
 
-CACHED_DIRS=".heroku"
+CACHED_DIRS=".heroku python"
 
 # Static configurations for virtualenv caches.
 VIRTUALENV_LOC=".heroku/venv"
@@ -26,7 +26,7 @@ LEGACY_TRIGGER="lib/python2.7"
 PROFILE_PATH="$BUILD_DIR/.profile.d/python.sh"
 
 DEFAULT_PYTHON_VERSION="python-2.7.6"
-PYTHON_EXE="/app/.heroku/python/bin/python"
+PYTHON_EXE="/app/python/bin/python"
 PIP_VERSION="1.5.4"
 SETUPTOOLS_VERSION="2.1"
 
@@ -79,7 +79,7 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
-export PATH=$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
+export PATH=$BUILD_DIR/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
 export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
@@ -103,8 +103,8 @@ if [ ! -f requirements.txt ]; then
 fi
 
 # Sticky runtimes.
-if [ -f $CACHE_DIR/.heroku/python-version ]; then
-  DEFAULT_PYTHON_VERSION=$(cat $CACHE_DIR/.heroku/python-version)
+if [ -f $CACHE_DIR/python-version ]; then
+  DEFAULT_PYTHON_VERSION=$(cat $CACHE_DIR/python-version)
 fi
 
 # If no runtime given, assume default version.
@@ -140,11 +140,11 @@ set +e
 PYTHON_VERSION=$(cat runtime.txt)
 
 # Install Python.
-if [ -f .heroku/python-version ]; then
-  if [ ! $(cat .heroku/python-version) = $PYTHON_VERSION ]; then
+if [ -f python-version ]; then
+  if [ ! $(cat python-version) = $PYTHON_VERSION ]; then
     bpwatch start uninstall_python
-      puts-step "Found $(cat .heroku/python-version), removing."
-      rm -fr .heroku/python
+      puts-step "Found $(cat python-version), removing."
+      rm -fr python
     bpwatch stop uninstall_python
   else
     SKIP_INSTALL=1
@@ -154,7 +154,7 @@ fi
 if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jx -C .heroku &> /dev/null
+    curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
     if [[ $? != 0 ]] ; then
       puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
@@ -162,13 +162,13 @@ if [ ! "$SKIP_INSTALL" ]; then
     fi
     ls .heroku
     which python
-    pyvenv .heroku/$PYTHON_VERSION
-    source .heroku/$PYTHON_VERSION/bin/activate
+    pyvenv $PYTHON_VERSION
+    source $PYTHON_VERSION/bin/activate
     which python
   bpwatch stop install_python
 
   # Record for future reference.
-  echo $PYTHON_VERSION > .heroku/python-version
+  echo $PYTHON_VERSION > python-version
   FRESH_PYTHON=true
 
   hash -r
@@ -186,14 +186,14 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
     # Prepare it for the real world
     puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
     cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install --prefix=$BUILD_DIR/.heroku/python 
+    python setup.py install --prefix=$BUILD_DIR/python 
     cd $WORKING_DIR
   bpwatch stop install_setuptoools
 
   bpwatch start install_pip
     puts-step "Installing Pip ($PIP_VERSION)"
     cd $ROOT_DIR/vendor/pip-$PIP_VERSION/
-    python setup.py install --prefix=$BUILD_DIR/.heroku/python 
+    python setup.py install --prefix=$BUILD_DIR/python 
     cd $WORKING_DIR
 
   bpwatch stop install_pip
@@ -212,7 +212,7 @@ bpwatch stop pylibmc_install
 # Install Mercurial if it appears to be required.
 if (grep -Fiq "hg+" requirements.txt) then
   bpwatch start mercurial_install
-    /app/.heroku/python/bin/pip install  mercurial | cleanup | indent
+    /app/python/bin/pip install  mercurial | cleanup | indent
   bpwatch stop mercurial_install
 fi
 
@@ -223,7 +223,7 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
-/app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
+/app/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
 
 [ ! "$FRESH_PYTHON" ] && bpwatch stop pip_install
 [ "$FRESH_PYTHON" ] && bpwatch stop pip_install_first
@@ -237,9 +237,9 @@ bpwatch stop collectstatic
 #
 
 # Set context environment variables.
-set-env PATH '$HOME/.heroku/python/bin:$PATH'
+set-env PATH '$HOME/python/bin:$PATH'
 set-env PYTHONUNBUFFERED true
-set-env PYTHONHOME /app/.heroku/python
+set-env PYTHONHOME /app/python
 set-default-env LIBRARY_PATH /app/.heroku/vendor/lib
 set-default-env LD_LIBRARY_PATH /app/.heroku/vendor/lib
 set-default-env LANG en_US.UTF-8
