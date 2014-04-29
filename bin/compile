@@ -163,7 +163,6 @@ if [ ! "$SKIP_INSTALL" ]; then
     ls .heroku
     which python
     pyvenv $PYTHON_VERSION
-    PYTHONPATH=$BUILD_DIR/python/lib/python3.3/site-packages/:$PYTHONPATH
     source $PYTHON_VERSION/bin/activate
     which python
     which pip
@@ -188,14 +187,14 @@ if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
     # Prepare it for the real world
     puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
     cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install --prefix=$BUILD_DIR/python 
+    python setup.py install --prefix=$PYTHON_VERSION
     cd $WORKING_DIR
   bpwatch stop install_setuptoools
 
   bpwatch start install_pip
     puts-step "Installing Pip ($PIP_VERSION)"
     cd $ROOT_DIR/vendor/pip-$PIP_VERSION/
-    python setup.py install --prefix=$BUILD_DIR/python 
+    python setup.py install --prefix=$PYTHON_VERSION
     cd $WORKING_DIR
 
   bpwatch stop install_pip
