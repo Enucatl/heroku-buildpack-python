@@ -163,8 +163,10 @@ if [ ! "$SKIP_INSTALL" ]; then
     ls .heroku
     which python
     pyvenv $PYTHON_VERSION
+    PYTHONPATH=$BUILD_DIR/python/lib/python3.3/site-packages/:$PYTHONPATH
     source $PYTHON_VERSION/bin/activate
     which python
+    which pip
   bpwatch stop install_python
 
   # Record for future reference.
