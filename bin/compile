@@ -162,7 +162,8 @@ if [ ! "$SKIP_INSTALL" ]; then
       exit 1
     fi
     mv python .heroku/python
-    pwd
+    pyvenv .heroku/$PYTHON_VERSION
+    source .heroku/$PYTHON_VERSION/bin/activate
   bpwatch stop install_python
 
   # Record for future reference.
