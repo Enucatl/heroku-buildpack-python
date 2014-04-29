@@ -220,10 +220,10 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
-pip install numpy
 pip install git+https://bitbucket.org/Enucatl/get_git_version.git
 python -c "import get_git_version"
 python -c "from get_git_version.get_git_version.version import get_git_version"
+pip install numpy
 pip install -r requirements.txt --exists-action=w --allow-all-external  | cleanup | indent
 
 [ ! "$FRESH_PYTHON" ] && bpwatch stop pip_install
