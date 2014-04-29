@@ -156,12 +156,16 @@ if [ ! "$SKIP_INSTALL" ]; then
   bpwatch start install_python
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
     curl http://immense-river-6847.s3.amazonaws.com/app/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
+    git clone git://github.com/yyuu/pyenv.git $BUILD_DIR/.heroku/python
+    export PYENV_ROOT=$BUILD_DIR/.heroku/python
+    pyenv init
+    pyenv install $PYTHON_VERSION
     if [[ $? != 0 ]] ; then
       puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
       exit 1
     fi
-    mv python .heroku/python
+    pyenv rehash
   bpwatch stop install_python
 
   # Record for future reference.
@@ -171,30 +175,6 @@ if [ ! "$SKIP_INSTALL" ]; then
   hash -r
 else
   puts-step "Using Python runtime ($PYTHON_VERSION)"
-fi
-
-# If Pip isn't up to date:
-if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
-  WORKING_DIR=$(pwd)
-
-  bpwatch start prepare_environment
-
-  bpwatch start install_setuptools
-    # Prepare it for the real world
-    puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
-    cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-  bpwatch stop install_setuptoools
-
-  bpwatch start install_pip
-    puts-step "Installing Pip ($PIP_VERSION)"
-    cd $ROOT_DIR/vendor/pip-$PIP_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-
-  bpwatch stop install_pip
-  bpwatch stop prepare_environment
 fi
 
 set -e
@@ -220,7 +200,7 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
-/app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
+pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
 
 [ ! "$FRESH_PYTHON" ] && bpwatch stop pip_install
 [ "$FRESH_PYTHON" ] && bpwatch stop pip_install_first
