@@ -160,8 +160,7 @@ if [ ! "$SKIP_INSTALL" ]; then
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
       exit 1
     fi
-    pyvenv $PYTHON_VERSION &> /dev/null
-    source $PYTHON_VERSION/bin/activate &> /dev/null
+    source .heroku/python/bin/activate &> /dev/null
   bpwatch stop install_python
 
   # Record for future reference.
