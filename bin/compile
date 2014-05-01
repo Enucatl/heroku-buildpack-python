@@ -168,35 +168,12 @@ if [ ! "$SKIP_INSTALL" ]; then
 
   # Record for future reference.
   echo $PYTHON_VERSION > python-version
+  pyenv versions
   FRESH_PYTHON=true
 
   hash -r
 else
   puts-step "Using Python runtime ($PYTHON_VERSION)"
-fi
-
-# If Pip isn't up to date:
-if [ "$FRESH_PYTHON" ] || [[ ! $(pip --version) == *$PIP_VERSION* ]]; then
-  WORKING_DIR=$(pwd)
-
-  bpwatch start prepare_environment
-
-  bpwatch start install_setuptools
-    # Prepare it for the real world
-    puts-step "Installing Setuptools ($SETUPTOOLS_VERSION)"
-    cd $ROOT_DIR/vendor/setuptools-$SETUPTOOLS_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-  bpwatch stop install_setuptoools
-
-  bpwatch start install_pip
-    puts-step "Installing Pip ($PIP_VERSION)"
-    cd $ROOT_DIR/vendor/pip-$PIP_VERSION/
-    python setup.py install &> /dev/null
-    cd $WORKING_DIR
-
-  bpwatch stop install_pip
-  bpwatch stop prepare_environment
 fi
 
 set -e
