@@ -206,9 +206,8 @@ bpwatch stop collectstatic
 #
 
 # Set context environment variables.
-set-env PATH '$HOME/python/bin:$PATH'
+set-env PATH '$PATH'
 set-env PYTHONUNBUFFERED true
-set-env PYTHONHOME /app/python
 set-default-env LIBRARY_PATH /app/.heroku/vendor/lib
 set-default-env LD_LIBRARY_PATH /app/.heroku/vendor/lib
 set-default-env LANG en_US.UTF-8
