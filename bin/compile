@@ -18,17 +18,14 @@ CACHE_DIR=$2
 ENV_DIR=$3
 
 
-CACHED_DIRS=".heroku python"
+CACHED_DIRS=".heroku .pyenv"
 
 # Static configurations for virtualenv caches.
 VIRTUALENV_LOC=".heroku/venv"
 LEGACY_TRIGGER="lib/python2.7"
 PROFILE_PATH="$BUILD_DIR/.profile.d/python.sh"
 
-DEFAULT_PYTHON_VERSION="python-2.7.6"
-PYTHON_EXE="/app/python/bin/python"
-PIP_VERSION="1.5.4"
-SETUPTOOLS_VERSION="2.1"
+DEFAULT_PYTHON_VERSION="2.7.6"
 
 # Setup bpwatch
 export PATH=$PATH:$ROOT_DIR/vendor/bpwatch
@@ -47,7 +44,6 @@ bpwatch build python $BUILDPACK_VERSION $REQUEST_ID
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
 bpwatch start compile
-
 
 # We'll need to send these statics to other scripts we `source`.
 export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
@@ -79,13 +75,13 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
-export PATH=$BUILD_DIR/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
+export PATH=$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/python/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
-export CPLUS_INCLUDE_PATH=/app/.heroku/python/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
-export LIBRARY_PATH=/app/.heroku/python/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
-export LD_LIBRARY_PATH=/app/.heroku/python/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export C_INCLUDE_PATH=/app/.pyenv/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
+export CPLUS_INCLUDE_PATH=/app/.pyenv/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include
+export LIBRARY_PATH=/app/.pyenv/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export LD_LIBRARY_PATH=/app/.pyenv/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
 export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config
 
 # Switch to the repo's context.
@@ -160,7 +156,13 @@ if [ ! "$SKIP_INSTALL" ]; then
       puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
       exit 1
     fi
-    source .heroku/python/bin/activate &> /dev/null
+    set -e
+    set -x
+    set-env PYENV_ROOT $HOME/.pyenv
+    set-env PATH "$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv rehash
+    echo $PYTHON_VERSION > .python-version
   bpwatch stop install_python
 
   # Record for future reference.
