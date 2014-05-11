@@ -35,18 +35,42 @@ export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
 # Syntax sugar.
 source $BIN_DIR/utils
 
+# Directory Hacks for path consistiency.
+APP_DIR='/app'
+TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
+
+# Copy Anvil app dir to temporary storage...
+bpwatch start anvil_appdir_stage
+if [ "$SLUG_ID" ]; then
+    mkdir -p $TMP_APP_DIR
+    deep-mv $APP_DIR $TMP_APP_DIR
+else
+    deep-rm $APP_DIR
+fi
+bpwatch stop anvil_appdir_stage
+
+# Copy Application code in.
+bpwatch start appdir_stage
+    deep-mv $BUILD_DIR $APP_DIR
+bpwatch stop appdir_stage
+
+# Set new context.
+ORIG_BUILD_DIR=$BUILD_DIR
+BUILD_DIR=$APP_DIR
+
 # Switch to the repo's context.
 cd $BUILD_DIR
 
 # If no requirements given, assume `setup.py develop`.
 if [ ! -f requirements.txt ]; then
-  puts-step "No requirements.txt provided; assuming dist package."
-  echo "-e ." > requirements.txt
+    puts-step "No requirements.txt provided; assuming dist package."
+    echo "-e ." > requirements.txt
 fi
 
 PYTHON_VERSION=$(cat .python-version)
 
 bpwatch start install_python
+
     puts-step "Preparing Python runtime ($PYTHON_VERSION)"
     curl http://immense-river-6847.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
     if [[ $? != 0 ]] ; then
@@ -56,7 +80,7 @@ bpwatch start install_python
     fi
 
     # copy the profile.d init files
-    mkdir -p $BUILD_DIR/.profile.d
+    mkdir -p .profile.d
     cp -n $ROOT_DIR/.profile .profile
     cp -n $ROOT_DIR/.profile.d/* .profile.d
     source .profile.d/*.sh
@@ -67,7 +91,7 @@ bpwatch stop install_python
 # Pylibmc support.
 # See [`bin/steps/pylibmc`](pylibmc.html).
 bpwatch start pylibmc_install
-  source $BIN_DIR/steps/pylibmc
+    source $BIN_DIR/steps/pylibmc
 bpwatch stop pylibmc_install
 
 # Install dependencies with Pip.
@@ -75,3 +99,14 @@ puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 
 pip install -e git+https://bitbucket.org/Enucatl/get_git_version.git#egg=get_git_version
 pip install -r requirements.txt --exists-action=w --allow-all-external  | cleanup | indent
+
+# ### Fin.
+bpwatch start appdir_commit
+    deep-mv $BUILD_DIR $ORIG_BUILD_DIR
+bpwatch stop appdir_commit
+
+bpwatch start anvil_appdir_commit
+    if [ "$SLUG_ID" ]; then
+        deep-mv $TMP_APP_DIR $APP_DIR
+    fi
+bpwatch stop anvil_appdir_commit
