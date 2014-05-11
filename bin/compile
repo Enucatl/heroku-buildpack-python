@@ -47,18 +47,21 @@ fi
 PYTHON_VERSION=$(cat .python-version)
 
 bpwatch start install_python
-puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-curl http://immense-river-6847.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
-if [[ $? != 0 ]] ; then
-    puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
-    puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
-    exit 1
-fi
+    puts-step "Preparing Python runtime ($PYTHON_VERSION)"
+    curl http://immense-river-6847.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
+    if [[ $? != 0 ]] ; then
+        puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
+        puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
+        exit 1
+    fi
 
-# copy the profile.d init files
-mkdir -p $BUILD_DIR/.profile.d
-cp -n $ROOT_DIR/.profile $BUILD_DIR/.profile
-cp -n $ROOT_DIR/.profile.d/* $BUILD_DIR/.profile.d
+    # copy the profile.d init files
+    mkdir -p $BUILD_DIR/.profile.d
+    cp -n $ROOT_DIR/.profile .profile
+    cp -n $ROOT_DIR/.profile.d/* .profile.d
+    source .profile.d/*.sh
+    source .profile
+
 bpwatch stop install_python
 
 # Pylibmc support.
