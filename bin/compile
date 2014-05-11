@@ -20,8 +20,6 @@ export PATH=$PATH:$ROOT_DIR/vendor/bpwatch
 LOGPLEX_KEY="t.b396af7f-ad75-4643-8b9e-ebb288acc624"
 export BPWATCH_STORE_PATH=$CACHE_DIR/bpwatch.json
 BUILDPACK_VERSION=v28
-echo "BUILDPACK_URL" $BUILDPACK_URL
-echo "S3_BUCKET" $S3_BUCKET
 
 # Support Anvil Build_IDs
 [ ! "$REQUEST_ID" ] && REQUEST_ID=$SLUG_ID
@@ -50,7 +48,7 @@ PYTHON_VERSION=$(cat .python-version)
 
 bpwatch start install_python
 puts-step "Preparing Python runtime ($PYTHON_VERSION)"
-curl http://${S3_BUCKET}.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
+curl http://immense-river-6847.s3.amazonaws.com/$PYTHON_VERSION.tar.bz2 -s | tar jx &> /dev/null
 if [[ $? != 0 ]] ; then
     puts-warn "Requested runtime ($PYTHON_VERSION) was not found."
     puts-warn "Aborting.  More info: https://devcenter.heroku.com/articles/python-support"
