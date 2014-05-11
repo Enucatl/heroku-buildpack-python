@@ -20,7 +20,8 @@ export PATH=$PATH:$ROOT_DIR/vendor/bpwatch
 LOGPLEX_KEY="t.b396af7f-ad75-4643-8b9e-ebb288acc624"
 export BPWATCH_STORE_PATH=$CACHE_DIR/bpwatch.json
 BUILDPACK_VERSION=v28
-echo $S3_BUCKET
+echo "BUILDPACK_URL" $BUILDPACK_URL
+echo "S3_BUCKET" $S3_BUCKET
 
 # Support Anvil Build_IDs
 [ ! "$REQUEST_ID" ] && REQUEST_ID=$SLUG_ID
