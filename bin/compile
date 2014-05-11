@@ -97,7 +97,6 @@ bpwatch stop pylibmc_install
 # Install dependencies with Pip.
 puts-step "Installing dependencies using Pip ($PIP_VERSION)"
 
-pip install -e git+https://bitbucket.org/Enucatl/get_git_version.git#egg=get_git_version
 pip install -r requirements.txt --exists-action=w --allow-all-external  | cleanup | indent
 
 # ### Fin.
