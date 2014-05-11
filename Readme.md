@@ -1,8 +1,8 @@
-Heroku buildpack: Stackless Python 3.3.5
+Heroku buildpack: Python with pyenv
 ========================
 
 Forked from the [Heroku python buildpack](https://github.com/heroku/heroku-buildpack-python), so that it
-installs stackless python 3.3.5.
+installs python through pyenv.
 
 
 Usage
@@ -10,10 +10,10 @@ Usage
 
 Example usage:
 
-    $ cat runtime.txt
+    $ cat .python-version
     stackless-3.3.5
 
-    $ heroku create --region eu --buildpack https://github.com/Enucatl/heroku-buildpack-python.git
+    $ heroku create --region eu --buildpack https://github.com/Enucatl/heroku-buildpack-python-pyenv.git
 
     $ git push heroku master
     ...
