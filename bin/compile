@@ -35,11 +35,6 @@ export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
 # Syntax sugar.
 source $BIN_DIR/utils
 
-# Copy Application code in.
-bpwatch start appdir_stage
-  deep-mv $BUILD_DIR $APP_DIR
-bpwatch stop appdir_stage
-
 # Switch to the repo's context.
 cd $BUILD_DIR
 
