@@ -49,9 +49,6 @@ if [ ! -f requirements.txt ]; then
   echo "-e ." > requirements.txt
 fi
 
-# The Cache
-mkdir -p $CACHE_DIR
-
 PYTHON_VERSION=$(cat .python-version)
 
 bpwatch start install_python
